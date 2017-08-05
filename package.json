@@ -1,0 +1,19 @@
+{
+  "name": "ha-aframe",
+  "version": "1.0.0",
+  "description": "VR Heliocentric Architecture using A-Frame",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Trygve Wastvedt (trygve.wastvedt@gmail.com)",
+  "license": "MIT",
+  "dependencies": {
+    "@types/aframe": "^0.5.0",
+    "aframe": "^0.6.1",
+    "parallelshell": "^3.0.1",
+    "tsify": "^3.0.1",
+    "watch-cli": "^0.2.2",
+    "watchify": "^3.9.0"
+  }
+}
