@@ -1,0 +1,35 @@
+<html>
+	<head>
+		<script type="text/javascript" src="../bundle.js"></script>
+	</head>
+
+	<body>
+
+		<a-scene>
+			<a-assets>
+				<a-asset-item id="hemisphereMesh" src="../assets/hemisphere-test-export.obj"></a-asset-item>
+			</a-assets>
+
+			<a-entity id="hemisphere" obj-model="obj: #hemisphereMesh" position="0 0 0" material-hemisphere-steps="scale: 2"></a-entity>
+
+			<!-- <a-entity camera universal-controls="fly: true;
+				movementControls: keyboard;
+				movementEasing: 15;
+				movementAcceleration: 80;" velocity="0 0 0" position="0 2 0" keyboard-controls></a-entity> -->
+
+			<a-sphere id="target" radius="0.1" position="0 0 0" material="color: #0099ff; transparent: true; opacity:0.5"></a-entity>
+
+			<a-entity
+				id="camera"
+				camera="fov: 80; zoom: 1;"
+				position="0 5 5"
+				orbit-controls="
+						target: #target;
+						enabled: true;
+						"
+				mouse-cursor="">
+		</a-entity>
+		</a-scene>
+
+	</body>
+</html>
