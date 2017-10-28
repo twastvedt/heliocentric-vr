@@ -1,16 +1,24 @@
-varying vec2 vUv;
-varying vec3 fNormal;
-uniform float scale;
+uniform vec3 sunAngle;
+
+varying vec3 vNormal;
+varying vec3 vColor;
+varying vec3 vPosition;
+varying vec2 vCeilingLoc;
+varying float fSunBlur;
 
 void main() {
 
-vUv = uv;
-fNormal = normal;
+vNormal = normal;
+vColor = color;
+vPosition = position.xyz;
 
-//adding the normal scales it outward
-//(normal scale equals sphere diameter)
-vec3 newPosition = position + normal * scale;
+vec3 vToCeiling = sunAngle / -sunAngle.y * position.y;
 
-gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
+vCeilingLoc = position.xz + vToCeiling.xz;
+
+// sunBlur = tan(0.5) * (distance to occluding object) (Sun's disc subtends 0.5 degree arc)
+fSunBlur = 0.0087269 * length(vToCeiling);
+
+gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 }

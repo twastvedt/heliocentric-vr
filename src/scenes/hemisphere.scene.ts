@@ -1,71 +1,60 @@
-import AFRAME = require('aframe');
+AFRAME = require('aframe');
 
-import glsl = require('glslify');
+require('aframe-animation-component');
 
 const extras = require('aframe-extras');
 
-//import ('aframe-physics-system/src/components/math/velocity');
-import ('aframe-orbit-controls-component-2');
+import 'aframe-orbit-controls-component-2';
 
-//const keyboardControls = require('aframe-keyboard-controls');
+import { SunSystem } from '../systems/Sun.system';
 
-//AFRAME.registerComponent('keyboard-controls', keyboardControls);
-//AFRAME.registerComponent('keyboard-controls', extras.controls['keyboard-controls']);
-//AFRAME.registerComponent('universal-controls', extras.controls['universal-controls']);
+import { HDDComp } from "../components/HDD.component";
 
+import { HemStepsMatComp } from '../components/HemStepsMat.component';
+import { HemStepsMatSys } from '../systems/HemStepsMat.system';
 
+import { FlatUnexposedMaterial } from "../components/FlatUnexposedMaterial.component";
 
-AFRAME.registerComponent('gltf-model-next', extras.loaders['gltf-model-next']);
+import { SunRotationComp } from '../components/SunRotation.component';
 
-const hemisphereStepsVert = glsl.file('../shaders/hemisphere-steps.vert.glsl');
-const hemisphereStepsFrag = glsl.file('../shaders/hemisphere-steps.frag.glsl');
+import { CopyPositionComp } from '../components/CopyPosition.component';
+import { CopyRotationComp } from '../components/CopyRotation.component';
 
-AFRAME.registerComponent('material-hemisphere-steps', {
-  schema: {
-    scale: {type: 'number'}
-  },
+extras.controls.registerAll();
 
-  /**
-   * Creates a new THREE.ShaderMaterial using the two shaders imported above.
-   */
-  init: function() {
+AFRAME.registerSystem( 'sun-system', SunSystem );
 
-    this.material  = new AFRAME.THREE.ShaderMaterial({
-      uniforms: {
-        time: { value: 0.0 },
-        scale: { value: this.data.scale }
-      },
-      vertexShader: hemisphereStepsVert,
-      fragmentShader: hemisphereStepsFrag
-		});
+AFRAME.registerComponent( 'hdd', HDDComp );
 
-    this.applyToMesh();
-    this.el.addEventListener('model-loaded', () => this.applyToMesh());
-  },
+AFRAME.registerSystem( 'material-hemisphere-steps', HemStepsMatSys );
+AFRAME.registerComponent( 'material-hemisphere-steps', HemStepsMatComp );
 
+AFRAME.registerComponent( 'sun-rotation', SunRotationComp );
 
-  /**
-   * Update the ShaderMaterial when component data changes.
-   */
-  update: function() {
-    this.material.uniforms.scale.value = this.data.scale;
-  },
+AFRAME.registerShader( 'flatUnexposed', FlatUnexposedMaterial )
 
-  /**
-   * Apply the material to the current entity.
-   */
-  applyToMesh: function() {
-    const mesh = this.el.getObject3D('mesh');
-    if (mesh) {
-      mesh.material = this.material;
-    }
-  },
+AFRAME.registerComponent( 'copy-position', CopyPositionComp );
+AFRAME.registerComponent( 'copy-rotation', CopyRotationComp );
 
-  /**
-   * On each frame, update the 'time' uniform in the shaders.
-   */
-  tick: function(t: number) {
-    this.material.uniforms.time.value = t / 1000;
-  }
+let scene: AFrame.Scene;
 
-})
+window.onkeyup = function(e) {
+	const key = e.keyCode ? e.keyCode : e.which;
+
+	switch (key) {
+		case 32:
+			// Space: toggle play
+			if (scene.isPlaying) {
+				scene.pause();
+			} else {
+				scene.play();
+			}
+			break;
+	}
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+	scene = document.querySelector('a-scene');
+
+	scene.renderer.toneMappingExposure = 1;
+}, false);
