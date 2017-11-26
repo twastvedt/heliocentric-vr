@@ -17,10 +17,13 @@ export interface sunSystemOb {
 	sunSpherical: THREE.Spherical;
 	sunPos: SunCalc.SunPosition;
 	sunLux: number;
-	sunColor: THREE.Color;
+	sunColor: [number, number, number];
 	skyLum: number;
-	skyColor: THREE.Color;
+	skyColor: [number, number, number];
+	sunSky: AFrame.Entity;
 	throttledTick: (t: number, dt: number) => void;
+	interpolate: (value: number, list: number[]) => number;
+	interpolateList: (value: number, list: number[][], dest: number[]) => number[];
 }
 
 export const SunSystem: AFrame.SystemDefinition<sunSystemOb> = {
@@ -34,7 +37,7 @@ export const SunSystem: AFrame.SystemDefinition<sunSystemOb> = {
 		longitude: { default: 0 },
 		latitude: { default: 78 },
 		// Multiplier to increase simulation speed.
-		speed: { default: 3000 },
+		speed: { default: 1000 },
 		// Update frequency, in seconds.
 		accuracy: { default: 1 }
 	},
@@ -42,13 +45,15 @@ export const SunSystem: AFrame.SystemDefinition<sunSystemOb> = {
 	init: function () {
 		this.scene = document.querySelector('a-scene');
 
+		this.sunSky = this.scene.querySelector('a-sun-sky');
+
 		this.sunVec = new AFRAME.THREE.Vector3( 0, -1, 0 );
 		this.sunSpherical = new AFRAME.THREE.Spherical();
 		this.sunPos = SunCalc.getPosition( this.data.dateTime, this.data.latitude, this.data.longitude );
 		this.sunLux = 0;
-		this.sunColor = new AFRAME.THREE.Color( 0x000000 );
+		this.sunColor = [0, 0, 0];
 		this.skyLum = 0;
-		this.skyColor = new AFRAME.THREE.Color( 0x000000 );
+		this.skyColor = [0, 0, 0];
 
 		this.tick = AFRAME.utils.throttleTick(this.throttledTick, this.data.accuracy * 1000 / this.data.speed, this);
 	},
@@ -65,53 +70,67 @@ export const SunSystem: AFrame.SystemDefinition<sunSystemOb> = {
 
 		this.sunVec.setFromSpherical( this.sunSpherical );
 
-		this.sunLux = interpolateList( 1 - this.sunSpherical.phi / Math.PI / 2, sunLuxValues );
+		if (this.sunSpherical.phi < Math.PI / 2) {
+			// Sun is above the horizon.
 
-		tempColor = interpolateList( 1 - this.sunSpherical.phi / Math.PI / 2, sunRGBValues );
-		this.sunColor.setRGB( tempColor[0], tempColor[1], tempColor[2] );
+			this.sunLux = this.interpolate( 1 - this.sunSpherical.phi / (Math.PI / 2), sunLuxValues );
 
-		this.skyLum = interpolateList( 1 - this.sunSpherical.phi / Math.PI / 2, skyLuminanceValues );
+			this.interpolateList( 1 - this.sunSpherical.phi / (Math.PI / 2), sunRGBValues, this.sunColor );
 
-		tempColor = interpolateList( 1 - this.sunSpherical.phi / Math.PI / 2, skyRGBValues );
-		this.skyColor.setRGB( tempColor[0], tempColor[1], tempColor[2] );
+			this.skyLum = this.interpolate( 1 - this.sunSpherical.phi / (Math.PI / 2), skyLuminanceValues );
 
-		// console.log(
-		// 	`Tick:
-		// 	Sun position: ${this.sunPos.altitude} altitude, ${this.sunPos.azimuth} azimuth
-		// 	Sun lux: ${this.sunLux}
-		// 	`
-		// );
+			this.interpolateList( 1 - this.sunSpherical.phi / (Math.PI / 2), skyRGBValues, this.skyColor );
+
+		} else if (this.sunSpherical.phi < 1.884955592153876) {
+			// Twilight: up to 18 degrees below horizon (phi < 108 degrees).
+
+			let twilightFactor = 1 - (this.sunSpherical.phi - (Math.PI / 2)) / 0.3141592653589793;
+
+			this.sunLux = 0;
+
+			this.skyLum = skyLuminanceValues[0] * twilightFactor;
+
+			this.skyColor = skyRGBValues[0];
+
+		} else {
+			this.sunLux = this.skyLum = 0;
+		}
+
+		// this.sunSky.setAttribute( 'material', 'sunPosition', { x: this.sunVec.x, y: this.sunVec.y, z: this.sunVec.z } );
 
 		// Create an event on the scene element which can be listened to by other components.
 		this.scene.emit('sunTick', {}, false);
-	}
-};
+	},
 
-/**
- * Evaluate list with decimal number by interpolation.
- * @param value [0-1]: Point to evaluate in list.
- * @param list List of values to interpolate.
- */
-function interpolateList(value: number, list: any[]) {
-	const n = (list.length - 1),
+	/**
+	 * Evaluate list of lists with decimal number by interpolation.
+	 * @param value [0-1]: Point to evaluate in list.
+	 * @param list List of lists of values to interpolate.
+	 */
+	interpolateList: function(value: number, list: number[][], dest: number[]){
+		const n = (list.length - 1),
+			i = Math.floor( value * n ),
+			f = value * n - i;
+
+		for (let j = 0; j < list[0].length; j += 1) {
+			dest[j] = (list[i+1][j] - list[i][j]) * f + list[i][j];
+		}
+
+		return dest;
+	},
+
+	interpolate: function(value: number, list: number[]){
+		const n = (list.length - 1),
 		i = Math.floor( value * n ),
 		f = value * n - i;
 
-		if (typeof list[0] === 'object') {
-			let result = [];
-			for (let j = 0; j < list[0].length; j += 1) {
-				result[j] = (list[i+1][j] - list[i][j]) * f + list[i][j];
-			}
+		return (list[i+1] - list[i]) * f + list[i];
+	}
+};
 
-			return result;
-
-		} else {
-			return (list[i+1] - list[i]) * f + list[i];
-		}
-}
 
 // Generated from Hosek-Wilkie sky model. Turbidity 1.0, Albedo 0.5.
-const sunRGBValues = [
+const sunRGBValues: [number, number, number][] = [
 	[1.000000,0.712447,0.000000],
 	[1.000000,0.818249,0.389460],
 	[1.000000,0.871649,0.627118],
@@ -181,7 +200,7 @@ const sunLuxValues = [
 	95381.338817
 ];
 
-const skyRGBValues = [
+const skyRGBValues: [number, number, number][] = [
 	[0.979509,0.998359,1.000000],
 	[0.840754,0.928285,1.000000],
 	[0.798561,0.904705,1.000000],

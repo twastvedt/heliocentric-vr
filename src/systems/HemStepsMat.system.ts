@@ -12,12 +12,12 @@ interface thisOb extends AFrame.System {
 	material: THREE.RawShaderMaterial;
 }
 
-function updateMaterial() {
-	this.material.uniforms.sunAngle.value = this.system.sunVec.negate();
-	this.material.uniforms.sunColor.value = this.system.sunColor.toArray();
+let updateMaterial: ((this: thisOb) => void) = function() {
+	//this.material.uniforms.sunAngle.value = this.system.sunVec.negate();
+	//this.material.uniforms.sunColor.value = this.system.sunColor;
 	this.material.uniforms.skyLum.value = this.system.skyLum;
-	this.material.uniforms.skyColor.value = this.system.skyColor.toArray();
-	this.material.uniforms.sunLux.value = this.system.sunLux;
+	//this.material.uniforms.skyColor.value = this.system.skyColor;
+  this.material.uniforms.sunLux.value = this.system.sunLux;
 }
 
 export const HemStepsMatSys: AFrame.SystemDefinition<thisOb> = {
@@ -33,9 +33,9 @@ export const HemStepsMatSys: AFrame.SystemDefinition<thisOb> = {
         halfSkylightLength: { value: 0.4 },
         sunAngle: { value: this.system.sunVec },
         sunLux: { value: this.system.sunLux },
-        sunColor: { value: this.system.sunColor.toArray() },
+        sunColor: { value: this.system.sunColor },
         skyLum: { value: this.system.skyLum },
-        skyColor: { value: this.system.skyColor.toArray() }
+        skyColor: { value: this.system.skyColor }
       },
       vertexShader: hemStepsVert,
       fragmentShader: hemStepsFrag

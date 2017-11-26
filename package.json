@@ -32,14 +32,15 @@
     "build:css": "sass src/style.scss:dist/style.css",
     "build-dev": "npm run copy:html && npm run build:ts-dev",
     "build": "npm run copy:html && npm run build:ts",
-    "watch:ts": "watchify src/scenes/hemisphere.scene.ts -p [ tsify --noImplicitAny ] -t glslify -o dist/bundle.js --debug --ignore-watch=\"dist/**\"",
+    "watch:ts": "rm dist/bundle.js && watchify src/scenes/hemisphere.scene.ts -v -p [ tsify --noImplicitAny ] -t glslify -o dist/bundle.js --debug --ignore-watch=\"dist/**/**\"",
     "watch:css": "npm run build:css -- --watch",
-    "serve": "live-server --no-browser dist",
+    "serve": "live-server --wait=300 --no-browser dist",
     "dev": "parallelshell \"npm run watch:ts\" \"npm run watch:css\" \"npm run serve\""
   },
   "devDependencies": {
     "@types/dateformat": "^1.0.1",
     "aframe-animation-component": "^3.2.5",
+    "aframe-sun-sky": "^3.0.3",
     "dateformat": "^3.0.2",
     "glsl-diffuse-oren-nayar": "^1.0.2",
     "suncalc": "^1.8.0"

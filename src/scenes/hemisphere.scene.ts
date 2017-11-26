@@ -2,6 +2,8 @@ AFRAME = require('aframe');
 
 require('aframe-animation-component');
 
+require('aframe-sun-sky');
+
 const extras = require('aframe-extras');
 
 import 'aframe-orbit-controls-component-2';
@@ -19,8 +21,10 @@ import { SunRotationComp } from '../components/SunRotation.component';
 
 import { CopyPositionComp } from '../components/CopyPosition.component';
 import { CopyRotationComp } from '../components/CopyRotation.component';
+import { ConstantScaleComp } from '../components/ConstantScale.component';
 
 extras.controls.registerAll();
+AFRAME.registerComponent('checkpoint', extras.misc.checkpoint);
 
 AFRAME.registerSystem( 'sun-system', SunSystem );
 
@@ -31,10 +35,11 @@ AFRAME.registerComponent( 'material-hemisphere-steps', HemStepsMatComp );
 
 AFRAME.registerComponent( 'sun-rotation', SunRotationComp );
 
-AFRAME.registerShader( 'flatUnexposed', FlatUnexposedMaterial )
+AFRAME.registerComponent( 'flat-unexposed', FlatUnexposedMaterial )
 
 AFRAME.registerComponent( 'copy-position', CopyPositionComp );
 AFRAME.registerComponent( 'copy-rotation', CopyRotationComp );
+AFRAME.registerComponent( 'constant-scale', ConstantScaleComp );
 
 let scene: AFrame.Scene;
 
@@ -57,4 +62,25 @@ document.addEventListener('DOMContentLoaded', () => {
 	scene = document.querySelector('a-scene');
 
 	scene.renderer.toneMappingExposure = 1;
+
+	scene.addEventListener('loaded', () => {
+		setTimeout(() => {
+			document.querySelector('[raycaster]').components.raycaster.refreshObjects();
+		}, 2000);
+
+		const checkpoints: NodeListOf<AFrame.Entity<any>> = document.querySelectorAll('[mixin="checkpoint"]');
+
+		// Hide current checkpoint.
+		document.querySelector('#camera').addEventListener('navigation-end', (e: any) => {
+
+			for (let i = 0; i < checkpoints.length; ++i) {
+				checkpoints[i].setAttribute('visible', true);
+			}
+
+			e.detail.checkpoint.parentEl.setAttribute('visible', false);
+		});
+
+	});
+
 }, false);
+

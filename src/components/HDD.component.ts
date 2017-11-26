@@ -2,7 +2,7 @@ AFRAME = require('aframe');
 
 let dateFormat: DateFormatStatic = require("dateformat");
 
-import { sunSystemOb } from '../systems/Sun.system';
+import { sunSystemOb, SunSystem } from '../systems/Sun.system';
 
 interface thisOb {
   sunSystem: sunSystemOb;
@@ -65,6 +65,24 @@ export const HDDComp: AFrame.ComponentDefinition<thisOb> = {
           that.el.querySelector('#hdd-follow').components['copy-rotation'].play();
         }
       }
+    });
+
+    // Control speed by clicking on the gauge target mesh.
+    this.el.querySelector('#hdd-speedTarget').addEventListener('click', (e) => {
+      const rotation = document.querySelector('#camera').components['rotation'].data.y;
+
+      const relRot = that.el.querySelector('#hdd-follow').components['rotation'].data.y;
+
+      const speedFraction = Math.min( Math.max( 0, (-(rotation - relRot) + 90) / 180), 1 );
+
+      that.el.querySelector('#hdd-speedMarker').setAttribute( 'rotation', 'z', -(speedFraction * 174.6 + 2.7 - 90) );
+
+      that.sunSystem.data.speed = Math.max(1, speedFraction * 1000);
+    });
+
+    // Reset time by clicking on reset icon.
+    this.el.querySelector('#hdd-resetTarget').addEventListener('click', () => {
+      that.sunSystem.data.dateTime = new Date((SunSystem.schema as any).dateTime.default);
     });
   },
 
