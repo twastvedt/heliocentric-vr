@@ -7,43 +7,57 @@ import { sunSystemOb } from './Sun.system';
 const hemStepsVert = glsl.file('../shaders/hemisphere-steps.vert.glsl');
 const hemStepsFrag = glsl.file('../shaders/hemisphere-steps.frag.glsl');
 
-interface thisOb extends AFrame.System {
-	system: sunSystemOb;
+const vertexColorsVert = glsl.file('../shaders/vertexColors.vert.glsl');
+const vertexColorsFrag = glsl.file('../shaders/vertexColors.frag.glsl');
+
+export interface HemStepsMatSysOb extends AFrame.System {
+	sunSystem: sunSystemOb;
 	material: THREE.RawShaderMaterial;
+	sunMaterial: THREE.RawShaderMaterial;
 }
 
-let updateMaterial: ((this: thisOb) => void) = function() {
-	//this.material.uniforms.sunAngle.value = this.system.sunVec.negate();
-	//this.material.uniforms.sunColor.value = this.system.sunColor;
-	this.material.uniforms.skyLum.value = this.system.skyLum;
-	//this.material.uniforms.skyColor.value = this.system.skyColor;
-  this.material.uniforms.sunLux.value = this.system.sunLux;
+let updateMaterial: ((this: HemStepsMatSysOb) => void) = function() {
+	this.material.uniforms.skyLum.value = this.sunSystem.skyLum;
+  this.sunMaterial.uniforms.skyLum.value = this.sunSystem.skyLum;
+
+  this.sunMaterial.uniforms.sunLux.value = this.sunSystem.sunLux;
 }
 
-export const HemStepsMatSys: AFrame.SystemDefinition<thisOb> = {
+export const HemStepsMatSys: AFrame.SystemDefinition<HemStepsMatSysOb> = {
   schema: { },
 
 	init: function () {
 
-		this.system = <any>document.querySelector('a-scene').systems['sun-system'] as sunSystemOb;
+		this.sunSystem = <any>document.querySelector('a-scene').systems['sun-system'] as sunSystemOb;
 
-    const material = new AFRAME.THREE.ShaderMaterial({
+    const sunMaterial = new AFRAME.THREE.ShaderMaterial({
       uniforms: {
         halfSkylightWidth: { value: 60.25 },
         halfSkylightLength: { value: 0.4 },
-        sunAngle: { value: this.system.sunVec },
-        sunLux: { value: this.system.sunLux },
-        sunColor: { value: this.system.sunColor },
-        skyLum: { value: this.system.skyLum },
-        skyColor: { value: this.system.skyColor }
+        sunAngle: { value: this.sunSystem.sunVec },
+        sunLux: { value: this.sunSystem.sunLux },
+        sunColor: { value: this.sunSystem.sunColor },
+        skyLum: { value: this.sunSystem.skyLum },
+        skyColor: { value: this.sunSystem.skyColor }
       },
       vertexShader: hemStepsVert,
       fragmentShader: hemStepsFrag
     });
 
-    material.vertexColors = AFRAME.THREE.VertexColors;
+    const material = new AFRAME.THREE.ShaderMaterial({
+      uniforms: {
+        skyLum: { value: this.sunSystem.skyLum },
+        skyColor: { value: this.sunSystem.skyColor }
+      },
+      vertexShader: vertexColorsVert,
+      fragmentShader: vertexColorsFrag
+    });
 
-		this.material = material;
+    material.vertexColors = AFRAME.THREE.VertexColors;
+    sunMaterial.vertexColors = AFRAME.THREE.VertexColors;
+
+    this.material = material;
+    this.sunMaterial = sunMaterial;
 
 		document.querySelector('a-scene').addEventListener('sunTick', updateMaterial.bind(this));
 	}

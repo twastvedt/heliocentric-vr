@@ -35,7 +35,7 @@ AFRAME.registerComponent( 'material-hemisphere-steps', HemStepsMatComp );
 
 AFRAME.registerComponent( 'sun-rotation', SunRotationComp );
 
-AFRAME.registerComponent( 'flat-unexposed', FlatUnexposedMaterial )
+AFRAME.registerShader( 'flatUnexposed', FlatUnexposedMaterial )
 
 AFRAME.registerComponent( 'copy-position', CopyPositionComp );
 AFRAME.registerComponent( 'copy-rotation', CopyRotationComp );

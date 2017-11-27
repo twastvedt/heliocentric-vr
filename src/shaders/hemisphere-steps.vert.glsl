@@ -23,10 +23,10 @@ void main() {
 
 	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-	// Divide color.r by 2 to compensate for inflated values in vertex colors (allows for smoother transitions).
+	// Divide color.r by 10 to compensate for inflated values in vertex colors (allows for smoother transitions).
 
 	// orenNayar( lightDir, viewDir, surfaceNormal, roughness (0 - pi/2?), albedo)
-	float ambientStrength = orenNayar( -normalize(position.xyz), normalize(cameraPosition - position.xyz), normal, 0.6, color.r * skyLum / 510.0 );
+	float ambientStrength = orenNayar( -normalize(position.xyz), normalize(cameraPosition - position.xyz), normal, 0.6, color.r * skyLum / 2550.0 );
 
 	// Remap 0.9-1 to 1-0.5.
 	float aoStrength = color.g >= 230.0 ? 5.0 * -color.g / 50.0 + 5.6 : 1.0;
