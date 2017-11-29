@@ -12,6 +12,7 @@ export interface sunSystemOb {
 		speed: Number;
 		accuracy: Number;
 	};
+	paused: boolean;
 	scene: AFrame.ANode;
 	sunVec: THREE.Vector3;
 	sunSpherical: THREE.Spherical;
@@ -38,11 +39,11 @@ export const SunSystem: AFrame.SystemDefinition<sunSystemOb> = {
 		latitude: { default: 78 },
 		// Multiplier to increase simulation speed.
 		speed: { default: 1000 },
-		// Update frequency, in seconds.
+		// Update frequency, in (actual time) seconds.
 		accuracy: { default: 1 }
 	},
 
-	init: function () {
+	init: function (this: sunSystemOb & AFrame.System) {
 		this.scene = document.querySelector('a-scene');
 
 		this.sunSky = this.scene.querySelector('a-sun-sky');
@@ -56,50 +57,59 @@ export const SunSystem: AFrame.SystemDefinition<sunSystemOb> = {
 		this.skyColor = [0, 0, 0];
 
 		this.tick = AFRAME.utils.throttleTick(this.throttledTick, this.data.accuracy * 1000 / this.data.speed, this);
+
+		const that = this;
+		this.scene.addEventListener('pause', () => {
+			that.paused = true;
+		});
 	},
 
   /**
    * Tick function that will be wrapped to be throttled.
    */
   throttledTick: function(this: sunSystemOb & AFrame.System, t: number, dt: number) {
-		this.data.dateTime.setTime(this.data.dateTime.getTime() + dt * this.data.speed);
-
-		this.sunPos = SunCalc.getPosition( this.data.dateTime, this.data.latitude, this.data.longitude );
-
-		this.sunSpherical.set( 1, Math.PI / 2 - this.sunPos.altitude, -this.sunPos.azimuth );
-
-		this.sunVec.setFromSpherical( this.sunSpherical );
-
-		if (this.sunSpherical.phi < Math.PI / 2) {
-			// Sun is above the horizon.
-
-			this.sunLux = this.interpolate( 1 - this.sunSpherical.phi / (Math.PI / 2), sunLuxValues );
-
-			this.interpolateList( 1 - this.sunSpherical.phi / (Math.PI / 2), sunRGBValues, this.sunColor );
-
-			this.skyLum = this.interpolate( 1 - this.sunSpherical.phi / (Math.PI / 2), skyLuminanceValues );
-
-			this.interpolateList( 1 - this.sunSpherical.phi / (Math.PI / 2), skyRGBValues, this.skyColor );
-
-		} else if (this.sunSpherical.phi < 1.884955592153876) {
-			// Twilight: up to 18 degrees below horizon (phi < 108 degrees).
-
-			let twilightFactor = 1 - (this.sunSpherical.phi - (Math.PI / 2)) / 0.3141592653589793;
-
-			this.sunLux = 0;
-
-			this.skyLum = skyLuminanceValues[0] * twilightFactor;
-
-			this.skyColor = skyRGBValues[0];
-
+		if (this.paused) {
+			this.paused = false;
 		} else {
-			this.sunLux = this.skyLum = 0;
+			this.data.dateTime.setTime(this.data.dateTime.getTime() + dt * this.data.speed);
+
+			this.sunPos = SunCalc.getPosition( this.data.dateTime, this.data.latitude, this.data.longitude );
+
+			this.sunSpherical.set( 1, Math.PI / 2 - this.sunPos.altitude, -this.sunPos.azimuth );
+
+			this.sunVec.setFromSpherical( this.sunSpherical );
+
+			if (this.sunSpherical.phi < Math.PI / 2) {
+				// Sun is above the horizon.
+
+				this.sunLux = this.interpolate( 1 - this.sunSpherical.phi / (Math.PI / 2), sunLuxValues );
+
+				this.interpolateList( 1 - this.sunSpherical.phi / (Math.PI / 2), sunRGBValues, this.sunColor );
+
+				this.skyLum = this.interpolate( 1 - this.sunSpherical.phi / (Math.PI / 2), skyLuminanceValues );
+
+				this.interpolateList( 1 - this.sunSpherical.phi / (Math.PI / 2), skyRGBValues, this.skyColor );
+
+			} else if (this.sunSpherical.phi < 1.884955592153876) {
+				// Twilight: up to 18 degrees below horizon (phi < 108 degrees).
+
+				let twilightFactor = 1 - (this.sunSpherical.phi - (Math.PI / 2)) / 0.3141592653589793;
+
+				this.sunLux = 0;
+
+				this.skyLum = skyLuminanceValues[0] * twilightFactor;
+
+				this.skyColor = skyRGBValues[0];
+
+			} else {
+				this.sunLux = this.skyLum = 0;
+			}
+
+			// this.sunSky.setAttribute( 'material', 'sunPosition', { x: this.sunVec.x, y: this.sunVec.y, z: this.sunVec.z } );
+
+			// Create an event on the scene element which can be listened to by other components.
+			this.scene.emit('sunTick', {}, false);
 		}
-
-		// this.sunSky.setAttribute( 'material', 'sunPosition', { x: this.sunVec.x, y: this.sunVec.y, z: this.sunVec.z } );
-
-		// Create an event on the scene element which can be listened to by other components.
-		this.scene.emit('sunTick', {}, false);
 	},
 
 	/**

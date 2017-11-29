@@ -2,11 +2,9 @@ AFRAME = require('aframe');
 
 require('aframe-animation-component');
 
-require('aframe-sun-sky');
+// require('aframe-sun-sky');
 
 const extras = require('aframe-extras');
-
-import 'aframe-orbit-controls-component-2';
 
 import { SunSystem } from '../systems/Sun.system';
 
@@ -83,4 +81,3 @@ document.addEventListener('DOMContentLoaded', () => {
 	});
 
 }, false);
-

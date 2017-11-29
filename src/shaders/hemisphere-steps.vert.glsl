@@ -8,10 +8,13 @@ varying vec2 vCeilingLoc;
 varying float fSunBlur;
 varying vec3 ambientLight;
 varying vec3 sunLight;
+varying vec3 vColor;
 
 #pragma glslify: orenNayar = require(glsl-diffuse-oren-nayar)
 
 void main() {
+
+	vColor = color;
 
 	vec3 vToCeiling = sunAngle / sunAngle.z * position.y;
 
@@ -27,11 +30,9 @@ void main() {
 
 	// orenNayar( lightDir, viewDir, surfaceNormal, roughness (0 - pi/2?), albedo)
 	float ambientStrength = orenNayar( -normalize(position.xyz), normalize(cameraPosition - position.xyz), normal, 0.6, color.r * skyLum / 2550.0 );
+	//float ambientStrength = dot(-normalize(position.xyz), normal) * 0.6 * color.r * skyLum / 2550.0;
 
-	// Remap 0.9-1 to 1-0.5.
-	float aoStrength = color.g >= 230.0 ? 5.0 * -color.g / 50.0 + 5.6 : 1.0;
-
-	ambientLight = skyColor * ambientStrength * aoStrength;
+	ambientLight = skyColor * ambientStrength;
 
 	sunLight = sunColor * sunLux;
 }

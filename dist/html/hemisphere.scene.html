@@ -44,7 +44,7 @@
 				<a-asset-item id="arcTarget-model" src="../assets/hemisphere/arcTarget.glb"></a-asset-item>
 
 				<a-mixin id="checkpointTarget" visible="false" checkpoint="offset: 0 0.6 0" scale="4 4 4"></a-mixin>
-				<a-mixin id="checkpoint" constant-scale="0.006 0.006 0.006" material="shader: flatUnexposed; color: #FF0000"></a-mixin>
+				<a-mixin id="checkpoint" constant-scale="0.006 0.006 0.006" material="shader: flatUnexposed; color: #800000"></a-mixin>
 
 			</a-assets>
 
@@ -62,6 +62,8 @@
 				enabled: true;
 				"> -->
 
+			<a-entity light="type: point; intensity: 0.1; distance: 80; decay: 0"
+				position="0 0 0"></a-entity>
 
 			<!-- HEADS-DOWN-DISPLAY -->
 			<a-entity id="hdd" hdd copy-position="parent: #camera; offset: 0 -1 0">
@@ -87,7 +89,7 @@
 			</a-entity>
 
 			<!-- CAMERA -->
-			<a-entity id="camera" camera="fov: 80; zoom: 1;" position="73.544 -3.937 13.164" rotation="0 90 0" universal-controls="movementControls: checkpoint, gamepad, keyboard, touch, hmd" checkpoint-controls>
+			<a-entity id="camera" camera="fov: 80; zoom: 1;" position="0 80 0" rotation="-90 0 0" universal-controls="movementControls: checkpoint, gamepad, keyboard, touch, hmd" checkpoint-controls>
 
 				<!-- HUD -->
 				<!-- <a-entity id="hud-bottom" position="0 0 0" rotation="-30 0 0">
@@ -119,21 +121,18 @@
 				<a-sphere mixin="checkpointTarget" class="target"></a-sphere>
 			</a-sphere>
 
-			<a-sphere mixin="checkpoint" position="73.544 -3.937 13.164">
+			<a-sphere mixin="checkpoint" position="73.2 -3.937 13.164">
 				<a-sphere mixin="checkpointTarget" class="target"></a-sphere>
 			</a-sphere>
 
 
 			<!-- <a-gltf-model id="collision" src="#collision-model"></a-gltf-model> -->
 
-			<!-- <a-gltf-model id="lightMask" src="#lightMask-model"></a-gltf-model>
-			<a-gltf-model id="lights" src="#lights-model"></a-gltf-model> -->
+			<a-gltf-model id="outside" src="#outside-model" material="shader: flatUnexposed; color: #000000"></a-gltf-model>
+			<a-gltf-model id="roof" src="#roof-model" material="shader: flatUnexposed; color: #000000"></a-gltf-model>
 
-			<a-gltf-model id="outside" src="#outside-model" material:"shader: flat; color: #000000"></a-gltf-model>
-			<a-gltf-model id="roof" src="#roof-model" material:"shader: flat; color: #000000"></a-gltf-model>
-
-			<a-gltf-model id="railing" src="#railing-model" material:"shader: flat; color: #010101"></a-gltf-model>
-			<a-gltf-model id="entryStair-railing" src="#entryStair-railing-model" material:"shader: flat; color: #010101"></a-gltf-model>
+			<a-gltf-model id="railing" src="#railing-model" material="color: #030303"></a-gltf-model>
+			<a-gltf-model id="entryStair-railing" src="#entryStair-railing-model" material="color: #030303"></a-gltf-model>
 
 			<a-gltf-model id="ceiling" src="#ceiling-model" material-hemisphere-steps="sun: false"></a-gltf-model>
 			<a-gltf-model id="roofColumns" src="#roofColumns-model" material-hemisphere-steps="sun: false"></a-gltf-model>
