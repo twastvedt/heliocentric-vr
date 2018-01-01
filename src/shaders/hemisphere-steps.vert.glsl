@@ -2,19 +2,25 @@ uniform vec3 sunAngle;
 uniform float skyLum;
 uniform float sunLux;
 uniform vec3 sunColor;
-uniform vec3 skyColor;
 
 varying vec2 vCeilingLoc;
 varying float fSunBlur;
-varying vec3 ambientLight;
+varying float albedo;
 varying vec3 sunLight;
-varying vec3 vColor;
+//varying vec3 vColor;
+varying vec2 vUV;
+varying vec3 vPosition;
+varying vec3 vNormal;
 
-#pragma glslify: orenNayar = require(glsl-diffuse-oren-nayar)
 
 void main() {
 
-	vColor = color;
+	vUV = uv;
+	//vColor = color;
+	vNormal = normal;
+	vPosition = position;
+
+	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 	vec3 vToCeiling = sunAngle / sunAngle.z * position.y;
 
@@ -24,15 +30,9 @@ void main() {
 	//fSunBlur = 0.0087269 * length(vToCeiling);
 	fSunBlur = 0.0087269 * length(vToCeiling);
 
-	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-
-	// Divide color.r by 10 to compensate for inflated values in vertex colors (allows for smoother transitions).
-
-	// orenNayar( lightDir, viewDir, surfaceNormal, roughness (0 - pi/2?), albedo)
-	float ambientStrength = orenNayar( -normalize(position.xyz), normalize(cameraPosition - position.xyz), normal, 0.6, color.r * skyLum / 2550.0 );
-	//float ambientStrength = dot(-normalize(position.xyz), normal) * 0.6 * color.r * skyLum / 2550.0;
-
-	ambientLight = skyColor * ambientStrength;
+	// albedo = (color.r: Fraction of visible hemisphere covered by sky [0-2*pi], 2*pi = Full hemisphere of skylight))
+	// Divide color.r by 10 to compensate for inflated values in vertex colors (allows for smoother transitions, since all values are very low).
+	albedo = color.r * skyLum / 10.0;
 
 	sunLight = sunColor * sunLux;
 }

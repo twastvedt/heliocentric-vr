@@ -27,7 +27,7 @@ export const HemStepsMatComp: AFrame.ComponentDefinition<thisOb, HemStepsMatSysO
           if (that.data.sun) {
             node.material = that.system.sunMaterial;
           } else {
-            node.material = that.system.material;
+            node.material = that.system.lightMapMaterial;
           }
         }
       });

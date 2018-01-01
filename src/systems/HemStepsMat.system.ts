@@ -10,15 +10,20 @@ const hemStepsFrag = glsl.file('../shaders/hemisphere-steps.frag.glsl');
 const vertexColorsVert = glsl.file('../shaders/vertexColors.vert.glsl');
 const vertexColorsFrag = glsl.file('../shaders/vertexColors.frag.glsl');
 
+const lightMapVert = glsl.file('../shaders/lightMap.vert.glsl');
+const lightMapFrag = glsl.file('../shaders/lightMap.frag.glsl');
+
 export interface HemStepsMatSysOb extends AFrame.System {
 	sunSystem: sunSystemOb;
-	material: THREE.RawShaderMaterial;
-	sunMaterial: THREE.RawShaderMaterial;
+	material: THREE.ShaderMaterial;
+	sunMaterial: THREE.ShaderMaterial;
+	lightMapMaterial: THREE.ShaderMaterial;
 }
 
 let updateMaterial: ((this: HemStepsMatSysOb) => void) = function() {
-	this.material.uniforms.skyLum.value = this.sunSystem.skyLum;
+	// this.material.uniforms.skyLum.value = this.sunSystem.skyLum;
   this.sunMaterial.uniforms.skyLum.value = this.sunSystem.skyLum;
+  this.lightMapMaterial.uniforms.skyLum.value = this.sunSystem.skyLum;
 
   this.sunMaterial.uniforms.sunLux.value = this.sunSystem.sunLux;
 }
@@ -28,7 +33,16 @@ export const HemStepsMatSys: AFrame.SystemDefinition<HemStepsMatSysOb> = {
 
 	init: function () {
 
-		this.sunSystem = <any>document.querySelector('a-scene').systems['sun-system'] as sunSystemOb;
+    this.sunSystem = <any>document.querySelector('a-scene').systems['sun-system'] as sunSystemOb;
+
+    const loader = new AFRAME.THREE.TextureLoader();
+    const concreteTexture = loader.load( '../assets/hemisphere/concrete-19-2048.png' );
+    // const concreteTexture = loader.load( '../assets/hemisphere/uv_checker_large.png' );
+    const lightMap = loader.load( '../assets/hemisphere/lightMap.png' );
+
+    //UVs are getting flipped in the blender export. flipY defaults to true, but setting it to false fixes this.
+    lightMap.flipY = false;
+    concreteTexture.wrapS = concreteTexture.wrapT = AFRAME.THREE.RepeatWrapping;
 
     const sunMaterial = new AFRAME.THREE.ShaderMaterial({
       uniforms: {
@@ -38,25 +52,40 @@ export const HemStepsMatSys: AFrame.SystemDefinition<HemStepsMatSysOb> = {
         sunLux: { value: this.sunSystem.sunLux },
         sunColor: { value: this.sunSystem.sunColor },
         skyLum: { value: this.sunSystem.skyLum },
-        skyColor: { value: this.sunSystem.skyColor }
+        skyColor: { value: this.sunSystem.skyColor },
+        texture: { value: concreteTexture },
+        repeat: { value: new AFRAME.THREE.Vector2( 0.1666, 0.1666 ) }
       },
       vertexShader: hemStepsVert,
       fragmentShader: hemStepsFrag
     });
 
-    const material = new AFRAME.THREE.ShaderMaterial({
+    // const material = new AFRAME.THREE.ShaderMaterial({
+    //   uniforms: {
+    //     skyLum: { value: this.sunSystem.skyLum },
+    //     skyColor: { value: this.sunSystem.skyColor }
+    //   },
+    //   vertexShader: vertexColorsVert,
+    //   fragmentShader: vertexColorsFrag
+    // });
+
+    const lightMapMaterial = new AFRAME.THREE.ShaderMaterial({
       uniforms: {
         skyLum: { value: this.sunSystem.skyLum },
-        skyColor: { value: this.sunSystem.skyColor }
+        skyColor: { value: this.sunSystem.skyColor },
+        lightMap: { value: lightMap },
+        texture: { value: concreteTexture },
+        repeat: { value: new AFRAME.THREE.Vector2( 0.1666, 0.1666 ) }
       },
-      vertexShader: vertexColorsVert,
-      fragmentShader: vertexColorsFrag
+      vertexShader: lightMapVert,
+      fragmentShader: lightMapFrag
     });
 
-    material.vertexColors = AFRAME.THREE.VertexColors;
+    // material.vertexColors = AFRAME.THREE.VertexColors;
     sunMaterial.vertexColors = AFRAME.THREE.VertexColors;
 
-    this.material = material;
+    // this.material = material;
+    this.lightMapMaterial = lightMapMaterial;
     this.sunMaterial = sunMaterial;
 
 		document.querySelector('a-scene').addEventListener('sunTick', updateMaterial.bind(this));

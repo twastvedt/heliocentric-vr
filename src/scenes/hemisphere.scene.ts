@@ -59,7 +59,7 @@ window.onkeyup = function(e) {
 document.addEventListener('DOMContentLoaded', () => {
 	scene = document.querySelector('a-scene');
 
-	scene.renderer.toneMappingExposure = 1;
+	scene.renderer.toneMappingExposure = 0.001;
 
 	scene.addEventListener('loaded', () => {
 		setTimeout(() => {
