@@ -42,6 +42,8 @@ export const HDDComp: AFrame.ComponentDefinition<thisOb> = {
 
             that.el.addState('focus');
 
+            document.querySelector('#pointer-hdd').object3D.visible = true;
+
             that.el.querySelector('#hdd-follow').components['copy-rotation'].pause();
           }
 
@@ -55,6 +57,8 @@ export const HDDComp: AFrame.ComponentDefinition<thisOb> = {
 
           if (that.el.is('focus')) {
             that.el.removeState('focus');
+
+            document.querySelector('#pointer-hdd').object3D.visible = false;
           }
 
         } else if (that.el.is('lookingDown')) {

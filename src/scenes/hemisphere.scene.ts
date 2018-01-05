@@ -20,6 +20,7 @@ import { SunRotationComp } from '../components/SunRotation.component';
 import { CopyPositionComp } from '../components/CopyPosition.component';
 import { CopyRotationComp } from '../components/CopyRotation.component';
 import { ConstantScaleComp } from '../components/ConstantScale.component';
+import { LockedPointerComp } from '../components/LockedPointer.component';
 
 extras.controls.registerAll();
 AFRAME.registerComponent('checkpoint', extras.misc.checkpoint);
@@ -38,6 +39,7 @@ AFRAME.registerShader( 'flatUnexposed', FlatUnexposedMaterial )
 AFRAME.registerComponent( 'copy-position', CopyPositionComp );
 AFRAME.registerComponent( 'copy-rotation', CopyRotationComp );
 AFRAME.registerComponent( 'constant-scale', ConstantScaleComp );
+AFRAME.registerComponent( 'locked-pointer', LockedPointerComp );
 
 let scene: AFrame.Scene;
 

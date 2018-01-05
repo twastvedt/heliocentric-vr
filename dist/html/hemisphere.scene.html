@@ -35,8 +35,11 @@
 
 				<a-asset-item id="arcTarget-model" src="../assets/hemisphere/arcTarget.glb"></a-asset-item>
 
+				<a-mixin id="checkpoint" constant-scale="0.006 0.006 0.006" material="shader: flatUnexposed; color: #800000"
+					animation__hover="property: constant-scale; startEvents: mouseenter; pauseEvents: mouseleave; easing: easeOutCubic; dur: 1000; to: 0.012 0.012 0.012"
+					animation__clear="property: constant-scale; startEvents: mouseleave; easing: easeInCubic; dur: 100; to: 0.006 0.006 0.006">
+				</a-mixin>
 				<a-mixin id="checkpointTarget" visible="false" checkpoint="offset: 0 0.6 0" scale="4 4 4"></a-mixin>
-				<a-mixin id="checkpoint" constant-scale="0.006 0.006 0.006" material="shader: flatUnexposed; color: #800000"></a-mixin>
 
 			</a-assets>
 
@@ -77,8 +80,23 @@
 
 					<a-image id="hdd-speedGauge" class="hdd-display" position="0 0 0" rotation="0 0 90" width="0.5" height="0.5" src="#hdd-speed-image" material="shader: flatUnexposed; useTex: 1"></a-image>
 					<a-image id="hdd-resetButton" class="hdd-display" position="0 0 0.01" width="0.1" height="0.1" src="#hdd-reset-image" material="shader: flatUnexposed; useTex: 1"></a-image>
+
 				</a-entity>
+
 			</a-entity>
+
+			<!-- HDD POINTER -->
+			<a-circle id="pointer-hdd" visible="false" locked-pointer="-0.9" scale="0.01 0.01 0.01" rotation="-90 0 0" material="color:gray; shader: flatUnexposed; opacity: 0.2; transparent: true">
+				<a-circle scale="0.001 0.001 0.001" position="0 0 -0.1" material="color:gray; shader: flatUnexposed"
+					animation__fuse="property: scale; startEvents: mouseenter; pauseEvents: mouseleave; easing: easeOutCubic; dur: 1000; to: 1.01 1.01 1.01"
+					animation__click="property: scale; startEvents: click; easing: easeInCubic; dur: 100; to: 0.001 0.001 0.001"
+					animation__clear="property: scale; startEvents: mouseleave; easing: easeInCubic; dur: 100; to: 0.001 0.001 0.001">
+
+					<a-entity raycaster="objects: .target; far: 100000" cursor="fuse: true; fuseTimeout: 1000" position="0 0 -0.1"
+						geometry="primitive: circle" scale="1 1 1" material="transparent: true; opacity: 0">
+					</a-entity>
+				</a-circle>
+			</a-circle>
 
 			<!-- CAMERA -->
 			<a-entity id="camera" camera="fov: 80; zoom: 1;" position="0 80 0" rotation="-90 0 0" universal-controls="movementControls: checkpoint, gamepad, keyboard, touch, hmd" checkpoint-controls>
@@ -92,21 +110,17 @@
 					</a-entity>
 				</a-entity> -->
 
-				<!-- POINTER -->
-				<a-circle scale="0.01 0.01 0.01" position="0 0 -0.5" material="color:gray; shader: flatUnexposed; opacity: 0.2; transparent: true">
-					<a-circle scale="0.001 0.001 0.001" position="0 0 -3" material="color:gray; shader: flatUnexposed"
-						animation__fuse="property: scale; startEvents: mouseenter; pauseEvents: mouseleave; easing: easeOutCubic; dur: 1000; to: 1.01 1.01 1.01"
-						animation__click="property: scale; startEvents: click; easing: easeInCubic; dur: 100; to: 0.001 0.001 0.001"
-						animation__clear="property: scale; startEvents: mouseleave; easing: easeInCubic; dur: 100; to: 0.001 0.001 0.001">
+				<!-- checkpoint POINTER -->
+				<a-circle id="pointer-checkpoint" position="0 0 -3" scale="0.01 0.01 0.01" material="opacity: 0; transparent: true"></a-circle>
 
-						<a-entity raycaster="objects: .target; far: 100000" cursor="fuse: true; fuseTimeout: 1000" position="0 0 -0.1"
-							geometry="primitive: circle" scale="1 1 1" material="transparent: true; opacity: 0">
-						</a-entity>
-					</a-circle>
+					<a-entity raycaster="objects: .target; far: 100000" cursor="fuse: true; fuseTimeout: 1000" position="0 0 -0.1"
+						geometry="primitive: circle" material="transparent: true; opacity: 0">
+					</a-entity>
 				</a-circle>
 
 				<!-- End Camera -->
 			</a-entity>
+
 
 			<!-- CHECKPOINTS -->
 			<a-sphere mixin="checkpoint" position="-33 -54 -33">

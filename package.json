@@ -35,7 +35,7 @@
     "watch:ts": "rm -f dist/bundle.js && watchify src/scenes/hemisphere.scene.ts -v -p [ tsify --noImplicitAny ] -t glslify -o dist/bundle.js --debug --ignore-watch=\"dist/**/**\"",
     "watch:css": "npm run build:css -- --watch",
     "serve": "live-server --wait=300 --no-browser dist",
-    "dev": "parallelshell \"npm run watch:ts\" \"npm run watch:css\" \"npm run serve\""
+    "dev": "parallelshell \"npm run watch:ts\" \"npm run serve\""
   },
   "devDependencies": {
     "@types/dateformat": "^1.0.1",
