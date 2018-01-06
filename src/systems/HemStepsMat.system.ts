@@ -37,7 +37,7 @@ export const HemStepsMatSys: AFrame.SystemDefinition<HemStepsMatSysOb> = {
 
     const loader = new AFRAME.THREE.TextureLoader();
     const concreteTexture = loader.load( './assets/hemisphere/concrete-19-2048.png' );
-    // const concreteTexture = loader.load( '../assets/hemisphere/uv_checker_large.png' );
+    // const concreteTexture = loader.load( './assets/hemisphere/uv_checker_large.png' );
     const lightMap = loader.load( './assets/hemisphere/lightMap.png' );
 
     //UVs are getting flipped in the blender export. flipY defaults to true, but setting it to false fixes this.

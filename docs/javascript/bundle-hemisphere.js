@@ -110929,7 +110929,6 @@ exports.SunRotationComp = {
 Object.defineProperty(exports, "__esModule", { value: true });
 AFRAME = require('aframe');
 require('aframe-animation-component');
-// require('aframe-sun-sky');
 var extras = require('aframe-extras');
 var Sun_system_1 = require("../systems/Sun.system");
 var HDD_component_1 = require("../components/HDD.component");
@@ -111008,9 +111007,9 @@ exports.HemStepsMatSys = {
     init: function () {
         this.sunSystem = document.querySelector('a-scene').systems['sun-system'];
         var loader = new AFRAME.THREE.TextureLoader();
-        var concreteTexture = loader.load('../assets/hemisphere/concrete-19-2048.png');
-        // const concreteTexture = loader.load( '../assets/hemisphere/uv_checker_large.png' );
-        var lightMap = loader.load('../assets/hemisphere/lightMap.png');
+        var concreteTexture = loader.load('./assets/hemisphere/concrete-19-2048.png');
+        // const concreteTexture = loader.load( './assets/hemisphere/uv_checker_large.png' );
+        var lightMap = loader.load('./assets/hemisphere/lightMap.png');
         //UVs are getting flipped in the blender export. flipY defaults to true, but setting it to false fixes this.
         lightMap.flipY = false;
         concreteTexture.wrapS = concreteTexture.wrapT = AFRAME.THREE.RepeatWrapping;
