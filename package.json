@@ -6,44 +6,42 @@
   "author": "Trygve Wastvedt (trygve.wastvedt@gmail.com)",
   "license": "MIT",
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/twastvedt/heliocentric-vr"
+    "type": "git",
+    "url": "https://github.com/twastvedt/heliocentric-vr"
   },
   "dependencies": {
     "@types/aframe": "^0.5.0",
     "@types/browserify": "^12.0.33",
+    "@types/dateformat": "^1.0.1",
     "aframe": "~0.7",
+    "aframe-animation-component": "^3.2.5",
     "aframe-extras": "^3.12.4",
     "aframe-keyboard-controls": "^1.3.0",
-    "aframe-orbit-controls-component-2": "^0.1.13",
-    "aframe-physics-system": "^2.1.0",
     "aframe-stereo-component": "^0.6.0",
+    "aframe-sun-sky": "^3.0.3",
     "aframe-template-component": "^3.2.1",
+    "dateformat": "^3.0.2",
     "factor-bundle": "^2.5.0",
     "globstar": "^1.0.0",
+    "glsl-diffuse-oren-nayar": "^1.0.2",
     "glslify": "^6.1.0",
     "parallelshell": "^3.0.2",
+    "suncalc": "^1.8.0",
     "tsify": "^3.0.3",
     "typescript": "^2.5.3",
     "watch-cli": "^0.2.3",
-    "watchify": "^3.9.0",
-    "@types/dateformat": "^1.0.1",
-    "aframe-animation-component": "^3.2.5",
-    "aframe-sun-sky": "^3.0.3",
-    "dateformat": "^3.0.2",
-    "glsl-diffuse-oren-nayar": "^1.0.2",
-    "suncalc": "^1.8.0"
+    "watchify": "^3.9.0"
   },
   "config": {
     "curScene": "stair"
   },
   "scripts": {
-    "build:ts": "browserify src/scenes/%npm_package_config_curScene%.scene.ts -p [ tsify --noImplicitAny ] -t glslify -o dist/bundle-%npm_package_config_curScene%.js",
+    "build:ts": "browserify src/scenes/%npm_package_config_curScene%.scene.ts -p [ tsify --noImplicitAny ] -t glslify -o docs/javascript/bundle-%npm_package_config_curScene%.js",
     "build:ts-dev": "npm run build:ts -- --debug",
     "build-dev": "npm run copy:html && npm run build:ts-dev",
     "build": "npm run copy:html && npm run build:ts",
-    "watch:ts": "rm -f dist/bundle.js && watchify src/scenes/%npm_package_config_curScene%.scene.ts -v -p [ tsify --noImplicitAny ] -t glslify -o dist/bundle-%npm_package_config_curScene%.js --debug --ignore-watch=\"dist/**/**\"",
-    "serve": "live-server --wait=300 --no-browser dist",
+    "watch:ts": "rm -f docs/javascript/bundle-%npm_package_config_curScene%.js && watchify src/scenes/%npm_package_config_curScene%.scene.ts -v -p [ tsify --noImplicitAny ] -t glslify -o docs/javascript/bundle-%npm_package_config_curScene%.js --debug --ignore-watch=\"docs/**/**\"",
+    "serve": "live-server --wait=300 --no-browser docs",
     "dev": "parallelshell \"npm run watch:ts\" \"npm run serve\""
   },
   "devDependencies": {

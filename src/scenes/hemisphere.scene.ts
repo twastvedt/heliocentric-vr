@@ -2,8 +2,6 @@ AFRAME = require('aframe');
 
 require('aframe-animation-component');
 
-// require('aframe-sun-sky');
-
 const extras = require('aframe-extras');
 
 import { SunSystem } from '../systems/Sun.system';
