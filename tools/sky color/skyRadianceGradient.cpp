@@ -1,3 +1,10 @@
+/**
+ * Sky Radiance Gradient
+ * Author: Trygve Wastvedt (trygvewastvedt.com)
+ *
+ * Uses the Hosek-Wilkie sky model to calculate the average radiance of the sky for a range of solar elevations.
+ * */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -26,98 +33,105 @@ using namespace std;
 
 int main(int argc, char** argv) {
 
-	// take the input for the ArHosekSkyModel
-	double turbidity = atof(argv[1]); //double turbidity = (1-10) if you want solar_radiance too (search assert in ArHosekSkyModel.c)
-	double albedo = atof(argv[2]);
-	int steps = atof(argv[3]);
-	int size = atof(argv[4]);
-	int samples = atof(argv[5]);
+  if ( argc != 6 ) { // argc should be 6 for correct execution
+    // We print argv[0] assuming it is the program name
+    printf("usage: %s <turbidity (1-10)> <albedo (0-1)> <solar elevation steps> <size of bitmap> <samples (e.g. 8)>\n", argv[0]);
 
-	BMP Output;
-	Output.SetSize( size * steps , size );
+    return 1;
+  }
 
-	Output.SetBitDepth( 24 );
+  // take the input for the ArHosekSkyModel
+  double turbidity = atof(argv[1]); //double turbidity = (1-10) if you want solar_radiance too (search assert in ArHosekSkyModel.c)
+  double albedo = atof(argv[2]);
+  int steps = atof(argv[3]);
+  int size = atof(argv[4]);
+  int samples = atof(argv[5]);
 
-	map<int, double> skyRadiance;
-	RGBApixel pixel;
-	Eigen::Vector3d sunVector;
-	Eigen::Vector3d sampleVector;
-	double sunElevation;
-	double sampleGamma;
-	double samplePhiStep;
+  BMP Output;
+  Output.SetSize( size * steps , size );
 
-	double sampleDistance = MAX_SAMPLE_THETA / (samples - 1);
-	double solarStep = (PI / 2.0 - 0.25 DEGREES) / (steps - 1);
+  Output.SetBitDepth( 24 );
 
-	int sampleCount;
+  map<int, double> skyRadiance;
+  RGBApixel pixel;
+  Eigen::Vector3d sunVector;
+  Eigen::Vector3d sampleVector;
+  double sunElevation;
+  double sampleGamma;
+  double samplePhiStep;
 
-	for (int i = 0; i < steps; ++i) {
+  double sampleDistance = MAX_SAMPLE_THETA / (samples - 1);
+  double solarStep = (PI / 2.0 - 0.25 DEGREES) / (steps - 1);
 
-		sampleCount = 0;
+  int sampleCount;
 
-		sunElevation = solarStep * i + 0.25 DEGREES;
+  for (int i = 0; i < steps; ++i) {
 
-		sunVector << cos(sunElevation), 0, sin(sunElevation);
+    sampleCount = 0;
 
-		ArHosekSkyModelState* skyState = arhosekskymodelstate_alloc_init( sunElevation, turbidity, albedo );
+    sunElevation = solarStep * i + 0.25 DEGREES;
 
-		for (double sampleTheta = 0; sampleTheta <= MAX_SAMPLE_THETA; sampleTheta += sampleDistance) {
+    sunVector << cos(sunElevation), 0, sin(sunElevation);
 
-			if (sampleTheta == 0.0) {
-				samplePhiStep = 2.0 * PI;
-			} else {
-				samplePhiStep = 2.0 * PI * sin(sampleTheta) / round(2.0 * PI * sin(sampleTheta) / sampleDistance);
-			}
+    ArHosekSkyModelState* skyState = arhosekskymodelstate_alloc_init( sunElevation, turbidity, albedo );
 
-			for (double samplePhi = 0; samplePhi < 2.0 * PI; samplePhi += samplePhiStep ) {
+    for (double sampleTheta = 0; sampleTheta <= MAX_SAMPLE_THETA; sampleTheta += sampleDistance) {
 
-				sampleVector << sin(sampleTheta) * cos(samplePhi), sin(sampleTheta) * sin(samplePhi), cos(sampleTheta);
+      if (sampleTheta == 0.0) {
+        samplePhiStep = 2.0 * PI;
+      } else {
+        samplePhiStep = 2.0 * PI * sin(sampleTheta) / round(2.0 * PI * sin(sampleTheta) / sampleDistance);
+      }
 
-				sampleGamma = acos(sunVector.dot(sampleVector));
+      for (double samplePhi = 0; samplePhi < 2.0 * PI; samplePhi += samplePhiStep ) {
 
-				for(int lambda = 380; lambda <= 720; lambda += 5) {
+        sampleVector << sin(sampleTheta) * cos(samplePhi), sin(sampleTheta) * sin(samplePhi), cos(sampleTheta);
 
-					// initialize
-					if (!skyRadiance.count(lambda)) {
-						skyRadiance[lambda] = 0;
-					}
+        sampleGamma = acos(sunVector.dot(sampleVector));
 
-					skyRadiance[lambda] += arhosekskymodel_radiance( skyState, sampleTheta, sampleGamma, lambda );
+        for(int lambda = 380; lambda <= 720; lambda += 5) {
 
-				}
+          // initialize
+          if (!skyRadiance.count(lambda)) {
+            skyRadiance[lambda] = 0;
+          }
 
-				sampleCount += 1;
-			}
-		}
+          skyRadiance[lambda] += arhosekskymodel_radiance( skyState, sampleTheta, sampleGamma, lambda );
 
-		for(int lambda = 380; lambda <= 720; lambda += 5) {
-			skyRadiance[lambda] /= sampleCount;
-		}
+        }
 
-		ColorSystem colorSystem( ColorData::shared().cs_srgb, ColorData::shared().illuminant_D65 );
+        sampleCount += 1;
+      }
+    }
 
-		Eigen::Vector3d skyRadXYZ = colorSystem.spec_to_xyz( skyRadiance );
-		Eigen::Vector3d skyRadRGB = colorSystem.rgb_to_srgb( colorSystem.rgb_to_srgb( colorSystem.xyz_to_rgb( skyRadXYZ ) ) );
+    for(int lambda = 380; lambda <= 720; lambda += 5) {
+      skyRadiance[lambda] /= sampleCount;
+    }
 
-		// Convert Y channel to luminance.
-		double luminance = skyRadXYZ[1] * 683.0;
+    ColorSystem colorSystem( ColorData::shared().cs_srgb, ColorData::shared().illuminant_D65 );
 
-		pixel.Red = skyRadRGB[0] * 255.0;
-		pixel.Green = skyRadRGB[1] * 255.0;
-		pixel.Blue = skyRadRGB[2] * 255.0;
+    Eigen::Vector3d skyRadXYZ = colorSystem.spec_to_xyz( skyRadiance );
+    Eigen::Vector3d skyRadRGB = colorSystem.rgb_to_srgb( colorSystem.rgb_to_srgb( colorSystem.xyz_to_rgb( skyRadXYZ ) ) );
 
-		//printf("[%lf,%lf,%lf],\n", skyRadRGB[0], skyRadRGB[1], skyRadRGB[2]);
-		printf("%lf,\n", luminance);
+    // Convert Y channel to luminance.
+    double luminance = skyRadXYZ[1] * 683.0;
 
-		for (int x = i * size; x < (i+1) * size; ++x) {
-			for (int y = 0; y < size; ++y) {
+    pixel.Red = skyRadRGB[0] * 255.0;
+    pixel.Green = skyRadRGB[1] * 255.0;
+    pixel.Blue = skyRadRGB[2] * 255.0;
 
-				Output.SetPixel( x, y, pixel );
-			}
-		}
-	}
+    //printf("[%lf,%lf,%lf],\n", skyRadRGB[0], skyRadRGB[1], skyRadRGB[2]);
+    printf("%lf,\n", luminance);
 
-	Output.WriteToFile( "skyRadianceGradient.bmp" );
+    for (int x = i * size; x < (i+1) * size; ++x) {
+      for (int y = 0; y < size; ++y) {
 
-	return 0;
+        Output.SetPixel( x, y, pixel );
+      }
+    }
+  }
+
+  Output.WriteToFile( "skyRadianceGradient.bmp" );
+
+  return 0;
 }

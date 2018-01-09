@@ -1,3 +1,12 @@
+/**
+ * Color System
+ * Author: Trygve Wastvedt (trygvewastvedt.com)
+ *
+ * A Color System object to facilitate conversion among RGB, XYZ, and spectral radiance.
+ * Converted from the Python code at https://scipython.com/blog/converting-a-spectrum-to-a-colour/
+ * Using explanation and some alternate math from http://www.ryanjuckett.com/programming/rgb-color-space-conversion/
+ * */
+
 #include <stdlib.h>
 #include <math.h>
 #include <iostream>

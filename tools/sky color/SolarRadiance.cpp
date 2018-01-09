@@ -1,3 +1,10 @@
+/**
+ * Solar Radiance
+ * Author: Trygve Wastvedt (trygvewastvedt.com)
+ *
+ * Uses the Hosek-Wilkie sky model to calculate the radiance of the visible sunlight for a given solar elevation.
+ * */
+
 #include "easyBMP/EasyBMP.h"
 #include "ArHosekSkyModel-1.4a/ArHosekSkyModel.h"
 
