@@ -8,7 +8,6 @@ varying vec3 sunLight;
 varying float albedo;
 varying vec2 vCeilingLoc;
 varying float fSunBlur;
-//varying vec3 vColor;
 varying vec2 vUV;
 varying vec3 vPosition;
 varying vec3 vNormal;
@@ -22,6 +21,7 @@ void main( void ) {
 	if (sunLight.r > 0.0) {
 		// Sun is shining
 
+		// Distance from origin to point on ceiling along sunlight path. If this is inside the skylight, then sun can see this point.
 		float xDist = abs(vCeilingLoc.x);
 		float zDist = abs(vCeilingLoc.y);
 

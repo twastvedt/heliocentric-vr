@@ -7,7 +7,6 @@ varying vec2 vCeilingLoc;
 varying float fSunBlur;
 varying float albedo;
 varying vec3 sunLight;
-//varying vec3 vColor;
 varying vec2 vUV;
 varying vec3 vPosition;
 varying vec3 vNormal;
@@ -16,7 +15,6 @@ varying vec3 vNormal;
 void main() {
 
 	vUV = uv;
-	//vColor = color;
 	vNormal = normal;
 	vPosition = position;
 
@@ -24,10 +22,10 @@ void main() {
 
 	vec3 vToCeiling = sunAngle / sunAngle.z * position.y;
 
+	// Calculate the point on the ceiling (xy plane) that sunlight would go through to get here. Used in the fragment shader to see if this point is in the skylight illumination.
 	vCeilingLoc = position.xz + vToCeiling.xy;
 
 	// sunBlur = tan(0.5) * (distance to occluding object) (Sun's disc subtends 0.5 degree arc)
-	//fSunBlur = 0.0087269 * length(vToCeiling);
 	fSunBlur = 0.0087269 * length(vToCeiling);
 
 	// albedo = (color.r: Fraction of visible hemisphere covered by sky [0-2*pi], 2*pi = Full hemisphere of skylight))
