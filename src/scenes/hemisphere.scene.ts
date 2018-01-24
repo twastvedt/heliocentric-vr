@@ -19,6 +19,7 @@ import { CopyPositionComp } from '../components/CopyPosition.component';
 import { CopyRotationComp } from '../components/CopyRotation.component';
 import { ConstantScaleComp } from '../components/ConstantScale.component';
 import { LockedPointerComp } from '../components/LockedPointer.component';
+import { MovingPointerComp } from '../components/MovingPointer.component';
 
 extras.controls.registerAll();
 AFRAME.registerComponent('checkpoint', extras.misc.checkpoint);
@@ -38,6 +39,7 @@ AFRAME.registerComponent( 'copy-position', CopyPositionComp );
 AFRAME.registerComponent( 'copy-rotation', CopyRotationComp );
 AFRAME.registerComponent( 'constant-scale', ConstantScaleComp );
 AFRAME.registerComponent( 'locked-pointer', LockedPointerComp );
+AFRAME.registerComponent( 'moving-pointer', MovingPointerComp );
 
 let scene: AFrame.Scene;
 
@@ -76,6 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			}
 
 			e.detail.checkpoint.parentEl.setAttribute('visible', false);
+
 		});
 
 	});
