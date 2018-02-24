@@ -1,6 +1,6 @@
 AFRAME = require('aframe');
 
-import SunCalc = require('suncalc');
+const SunCalc = require('suncalc');
 
 let tempColor = [0, 0, 0];
 

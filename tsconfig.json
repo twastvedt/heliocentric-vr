@@ -1,9 +1,10 @@
 {
 	"compilerOptions": {
 		"noImplicitAny": true,
-		"target": "es5",
+		"target": "es2015",
 		"lib": [ "es2015", "dom" ],
 		"allowJs": true,
-		"outDir": "docs/javascript"
+		"outDir": "docs/javascript",
+		"typeRoots" : ["./types", "./node_modules/@types"]
 	}
 }

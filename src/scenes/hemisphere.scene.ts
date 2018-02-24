@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			document.querySelector('[raycaster]').components.raycaster.refreshObjects();
 		}, 2000);
 
-		const checkpoints: NodeListOf<AFrame.Entity<any>> = document.querySelectorAll('[mixin="checkpoint"]');
+		const checkpoints = (document.querySelectorAll('[mixin="checkpoint"]') as NodeListOf<AFrame.Entity<any>>);
 
 		// Hide current checkpoint.
 		document.querySelector('#camera').addEventListener('navigation-end', (e: any) => {

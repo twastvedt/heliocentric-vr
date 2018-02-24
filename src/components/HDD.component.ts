@@ -12,6 +12,22 @@ interface thisOb {
   setChildrenOpacity: (this: AFrame.Component<thisOb>, opacity: number ) => void;
 }
 
+let pointerFuse: AFrame.Entity;
+
+const pointerScale = {x: 0.001, y: 0.001, z: 0.001};
+
+let fuseScale = AFRAME.anime({
+	targets: pointerScale,
+	autoplay: false,
+	x: [0.001, 1],
+	y: [0.001, 1],
+	z: [0.001, 1],
+	duration: 1000,
+	update: (anim) => {
+		pointerFuse.setAttribute('scale', pointerScale)
+	}
+});
+
 export const HDDComp: AFrame.ComponentDefinition<thisOb> = {
   schema: { },
 
@@ -25,6 +41,8 @@ export const HDDComp: AFrame.ComponentDefinition<thisOb> = {
 
     this.dateTime = this.el.querySelector('#hdd-dateTime');
 
+    pointerFuse = document.querySelector('#pointer-hdd-fuse');
+
     this.setChildrenOpacity(0.2);
 
     let that = this;
@@ -33,7 +51,7 @@ export const HDDComp: AFrame.ComponentDefinition<thisOb> = {
     });
 
     document.querySelector('#camera').addEventListener('componentchanged', function (evt) {
-      // Set 'lookingDown' state on the HDD entity if the camera is looking down more than 45 degrees. Fades in HDD.
+      // Set 'lookingDown' state on the HDD entity if the camera is looking down more than 55 degrees. Fades in HDD.
       // Set 'focus' state if the camera is looking at the HDD (currently <= -63 degrees). Locks rotation of controls.
       if (evt.detail.name === 'rotation') {
 
@@ -66,9 +84,20 @@ export const HDDComp: AFrame.ComponentDefinition<thisOb> = {
 
           that.setChildrenOpacity(0.2);
 
+          document.querySelector('#pointer-hdd').object3D.visible = false;
+
           that.el.querySelector('#hdd-follow').components['copy-rotation'].play();
         }
       }
+    });
+
+    pointerFuse.addEventListener('raycaster-intersection', (e: any) => {
+      fuseScale.play();
+    });
+
+    pointerFuse.addEventListener('raycaster-intersection-cleared', (e: any) => {
+      fuseScale.pause();
+      fuseScale.seek(0);
     });
 
     // Control speed by clicking on the gauge target mesh.

@@ -1,6 +1,6 @@
 AFRAME = require('aframe');
 
-import glsl = require('glslify');
+let glsl = require('glslify');
 
 const flatUnexposedVert = glsl.file('../shaders/flatUnexposed.vert.glsl');
 const flatUnexposedFrag = glsl.file('../shaders/flatUnexposed.frag.glsl');

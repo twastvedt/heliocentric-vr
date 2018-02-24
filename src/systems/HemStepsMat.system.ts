@@ -1,6 +1,6 @@
 AFRAME = require('aframe');
 
-import glsl = require('glslify');
+const glsl = require('glslify');
 
 import { sunSystemOb } from './Sun.system';
 
@@ -13,7 +13,7 @@ const vertexColorsFrag = glsl.file('../shaders/vertexColors.frag.glsl');
 const lightMapVert = glsl.file('../shaders/lightMap.vert.glsl');
 const lightMapFrag = glsl.file('../shaders/lightMap.frag.glsl');
 
-export interface HemStepsMatSysOb extends AFrame.System {
+export interface HemStepsMatSysOb {
 	sunSystem: sunSystemOb;
 	material: THREE.ShaderMaterial;
 	sunMaterial: THREE.ShaderMaterial;

@@ -2,11 +2,14 @@ AFRAME = require('aframe');
 
 import { HemStepsMatSysOb } from '../systems/HemStepsMat.system';
 
-interface thisOb extends AFrame.Component {
-  applyToMesh: () => void;
+interface thisOb {
+  data: {
+    sun: boolean;
+  };
+  applyToMesh: (this: AFrame.Component<thisOb, AFrame.System<HemStepsMatSysOb>>) => void;
 }
 
-export const HemStepsMatComp: AFrame.ComponentDefinition<thisOb, HemStepsMatSysOb> = {
+export const HemStepsMatComp: AFrame.ComponentDefinition<thisOb, AFrame.System<HemStepsMatSysOb>> = {
   schema: {
     sun: { default: true }
   },
@@ -17,7 +20,7 @@ export const HemStepsMatComp: AFrame.ComponentDefinition<thisOb, HemStepsMatSysO
     this.el.addEventListener('model-loaded', () => this.applyToMesh());
   },
 
-  applyToMesh: function(this: AFrame.Component<thisOb, HemStepsMatSysOb>) {
+  applyToMesh: function() {
     const mesh = this.el.getObject3D('mesh'),
       that = this;
 
