@@ -60,7 +60,7 @@ export const MovingPointerComp: AFrame.ComponentDefinition = {
 				targetPos.setFromMatrixPosition( curNear.matrixWorld );
 
 				const dist = 0.7 * camPos.distanceTo( targetPos );
-				this.el.querySelector('#pointer-cursor').object3D.position.setZ( -dist );
+				this.el.querySelector<AFrame.Entity>('#pointer-cursor').object3D.position.setZ( -dist );
 
 			} else if (e.srcElement.id === 'pointer-raycaster-fuse' && (!curFuse || e.detail.els[0].object3D.uuid !== curFuse.uuid)) {
 				// Moving onto a checkpoint

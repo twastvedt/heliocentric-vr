@@ -1,15 +1,17 @@
 AFRAME = require('aframe');
 
-import { HemStepsMatSysOb } from '../systems/HemStepsMat.system';
+import { HemStepsMatSys } from '../systems/HemStepsMat.system';
 
-interface thisOb {
+interface HemStepsMat extends AFrame.Component {
   data: {
     sun: boolean;
   };
-  applyToMesh: (this: AFrame.Component<thisOb, AFrame.System<HemStepsMatSysOb>>) => void;
+  system: HemStepsMatSys;
+
+  applyToMesh: (this: HemStepsMat) => void;
 }
 
-export const HemStepsMatComp: AFrame.ComponentDefinition<thisOb, AFrame.System<HemStepsMatSysOb>> = {
+export const HemStepsMatComp: AFrame.ComponentDefinition<HemStepsMat> = {
   schema: {
     sun: { default: true }
   },

@@ -4,13 +4,13 @@ const SunCalc = require('suncalc');
 
 let tempColor = [0, 0, 0];
 
-export interface sunSystemOb {
+export interface Sun extends AFrame.System {
 	data: {
 		dateTime: Date;
-		longitude: Number;
-		latitude: Number;
-		speed: Number;
-		accuracy: Number;
+		longitude: number;
+		latitude: number;
+		speed: number;
+		accuracy: number;
 	};
 	paused: boolean;
 	scene: AFrame.ANode;
@@ -22,12 +22,12 @@ export interface sunSystemOb {
 	skyLum: number;
 	skyColor: [number, number, number];
 	sunSky: AFrame.Entity;
-	throttledTick: (t: number, dt: number) => void;
-	interpolate: (value: number, list: number[]) => number;
-	interpolateList: (value: number, list: number[][], dest: number[]) => number[];
+	throttledTick: (this: this, t: number, dt: number) => void;
+	interpolate: (this: this, value: number, list: number[]) => number;
+	interpolateList: (this: this, value: number, list: number[][], dest: number[]) => number[];
 }
 
-export const SunSystem: AFrame.SystemDefinition<sunSystemOb> = {
+export const SunSystem: AFrame.SystemDefinition<Sun> = {
   schema: {
 		dateTime: {
 			default: new Date( Date.UTC( 2017, 6, 22, 0, 0, 0, 0 ) ),
@@ -43,7 +43,7 @@ export const SunSystem: AFrame.SystemDefinition<sunSystemOb> = {
 		accuracy: { default: 1 }
 	},
 
-	init: function (this: sunSystemOb & AFrame.System) {
+	init: function () {
 		this.scene = document.querySelector('a-scene');
 
 		this.sunSky = this.scene.querySelector('a-sun-sky');
@@ -67,7 +67,7 @@ export const SunSystem: AFrame.SystemDefinition<sunSystemOb> = {
   /**
    * Tick function that will be wrapped to be throttled.
    */
-  throttledTick: function(this: sunSystemOb & AFrame.System, t: number, dt: number) {
+  throttledTick: function(t: number, dt: number) {
 		if (this.paused) {
 			this.paused = false;
 		} else {

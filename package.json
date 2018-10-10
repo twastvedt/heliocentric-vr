@@ -40,8 +40,6 @@
   "scripts": {
     "build:ts": "browserify src/scenes/%npm_package_config_curScene%.scene.ts -p [ tsify --noImplicitAny ] -t glslify -o docs/javascript/bundle-%npm_package_config_curScene%.js",
     "build:ts-dev": "npm run build:ts -- --debug",
-    "build-dev": "npm run copy:html && npm run build:ts-dev",
-    "build": "npm run copy:html && npm run build:ts",
     "watch:ts": "rm -f docs/javascript/bundle-%npm_package_config_curScene%.js && watchify src/scenes/%npm_package_config_curScene%.scene.ts -v -p [ tsify --noImplicitAny ] -t glslify -o docs/javascript/bundle-%npm_package_config_curScene%.js --debug --ignore-watch=\"docs/**/**\"",
     "serve": "live-server --wait=300 --no-browser docs",
     "dev": "parallelshell \"npm run watch:ts\" \"npm run serve\""

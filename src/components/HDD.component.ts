@@ -2,14 +2,14 @@ AFRAME = require('aframe');
 
 let dateFormat: DateFormatStatic = require("dateformat");
 
-import { sunSystemOb, SunSystem } from '../systems/Sun.system';
+import { Sun, SunSystem } from '../systems/Sun.system';
 
-interface thisOb {
-  sunSystem: sunSystemOb;
+interface HDD extends AFrame.Component {
+  sunSystem: Sun;
   children: AFrame.Entity[];
   dateTime: AFrame.Entity;
 
-  setChildrenOpacity: (this: AFrame.Component<thisOb>, opacity: number ) => void;
+  setChildrenOpacity: (this: this, opacity: number ) => void;
 }
 
 let pointerFuse: AFrame.Entity;
@@ -28,14 +28,14 @@ let fuseScale = AFRAME.anime({
 	}
 });
 
-export const HDDComp: AFrame.ComponentDefinition<thisOb> = {
+export const HDDComp: AFrame.ComponentDefinition<HDD> = {
   schema: { },
 
   /**
    * Creates a new THREE.ShaderMaterial using the two shaders imported above.
    */
   init: function() {
-    this.sunSystem = <any>document.querySelector('a-scene').systems['sun-system'] as sunSystemOb;
+    this.sunSystem = <any>document.querySelector('a-scene').systems['sun-system'] as Sun;
 
     this.children = [].slice.call(this.el.children);
 
@@ -62,7 +62,7 @@ export const HDDComp: AFrame.ComponentDefinition<thisOb> = {
 
             document.querySelector('#pointer-hdd').object3D.visible = true;
 
-            that.el.querySelector('#hdd-follow').components['copy-rotation'].pause();
+            that.el.querySelector<AFrame.Entity>('#hdd-follow').components['copy-rotation'].pause();
           }
 
         } else if (evt.target.getAttribute('rotation').x < -55 ) {
@@ -86,7 +86,7 @@ export const HDDComp: AFrame.ComponentDefinition<thisOb> = {
 
           document.querySelector('#pointer-hdd').object3D.visible = false;
 
-          that.el.querySelector('#hdd-follow').components['copy-rotation'].play();
+          that.el.querySelector<AFrame.Entity>('#hdd-follow').components['copy-rotation'].play();
         }
       }
     });
@@ -101,14 +101,14 @@ export const HDDComp: AFrame.ComponentDefinition<thisOb> = {
     });
 
     // Control speed by clicking on the gauge target mesh.
-    this.el.querySelector('#hdd-speedTarget').addEventListener('click', (e) => {
+    this.el.querySelector('#hdd-speedTarget').addEventListener('click', () => {
       const rotation = document.querySelector('#camera').components['rotation'].data.y;
 
-      const relRot = that.el.querySelector('#hdd-follow').components['rotation'].data.y;
+      const relRot = that.el.querySelector<AFrame.Entity>('#hdd-follow').components['rotation'].data.y;
 
       const speedFraction = Math.min( Math.max( 0, (-(rotation - relRot) + 90) / 180), 1 );
 
-      that.el.querySelector('#hdd-speedMarker').setAttribute( 'rotation', 'z', -(speedFraction * 174.6 + 2.7 - 90) );
+      that.el.querySelector<AFrame.Entity>('#hdd-speedMarker').setAttribute( 'rotation', 'z', -(speedFraction * 174.6 + 2.7 - 90) );
 
       that.sunSystem.data.speed = Math.max(1, speedFraction * 1000);
     });

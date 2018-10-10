@@ -2,7 +2,7 @@ AFRAME = require('aframe');
 
 const glsl = require('glslify');
 
-import { sunSystemOb } from './Sun.system';
+import { Sun } from './Sun.system';
 
 const hemStepsVert = glsl.file('../shaders/hemisphere-steps.vert.glsl');
 const hemStepsFrag = glsl.file('../shaders/hemisphere-steps.frag.glsl');
@@ -13,14 +13,14 @@ const vertexColorsFrag = glsl.file('../shaders/vertexColors.frag.glsl');
 const lightMapVert = glsl.file('../shaders/lightMap.vert.glsl');
 const lightMapFrag = glsl.file('../shaders/lightMap.frag.glsl');
 
-export interface HemStepsMatSysOb {
-	sunSystem: sunSystemOb;
+export interface HemStepsMatSys extends AFrame.System {
+	sunSystem: Sun;
 	material: THREE.ShaderMaterial;
 	sunMaterial: THREE.ShaderMaterial;
 	lightMapMaterial: THREE.ShaderMaterial;
 }
 
-let updateMaterial: ((this: HemStepsMatSysOb) => void) = function() {
+let updateMaterial: ((this: HemStepsMatSys) => void) = function() {
 	// this.material.uniforms.skyLum.value = this.sunSystem.skyLum;
   this.sunMaterial.uniforms.skyLum.value = this.sunSystem.skyLum;
   this.lightMapMaterial.uniforms.skyLum.value = this.sunSystem.skyLum;
@@ -28,12 +28,12 @@ let updateMaterial: ((this: HemStepsMatSysOb) => void) = function() {
   this.sunMaterial.uniforms.sunLux.value = this.sunSystem.sunLux;
 }
 
-export const HemStepsMatSys: AFrame.SystemDefinition<HemStepsMatSysOb> = {
+export const HemStepsMatSys: AFrame.SystemDefinition<HemStepsMatSys> = {
   schema: { },
 
 	init: function () {
 
-    this.sunSystem = <any>document.querySelector('a-scene').systems['sun-system'] as sunSystemOb;
+    this.sunSystem = <any>document.querySelector('a-scene').systems['sun-system'] as Sun;
 
     const loader = new AFRAME.THREE.TextureLoader();
     const concreteTexture = loader.load( './assets/hemisphere/concrete-19-2048.png' );

@@ -3,7 +3,7 @@ AFRAME = require('aframe');
 let parentRot = {x: 0, y: 0, z: 0};
 let tempRot = {x: 0, y: 0, z: 0};
 
-interface thisOb extends AFrame.Component {
+interface CopyRotation extends AFrame.Component {
 	data: {
 		parent: AFrame.Entity;
 
@@ -19,7 +19,7 @@ interface thisOb extends AFrame.Component {
 	}
 }
 
-export const CopyRotationComp: AFrame.ComponentDefinition<thisOb> = {
+export const CopyRotationComp: AFrame.ComponentDefinition<CopyRotation> = {
   schema: {
 		parent: { type: 'selector' },
 		offset: { type: 'vec3' },
