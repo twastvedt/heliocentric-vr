@@ -30,7 +30,7 @@ export interface Sun extends AFrame.System {
 export const SunSystem: AFrame.SystemDefinition<Sun> = {
   schema: {
 		dateTime: {
-			default: new Date( Date.UTC( 2017, 6, 22, 0, 0, 0, 0 ) ),
+			default: new Date( Date.UTC( 2018, 5, 22, 0, 0, 0, 0 ) ),
 			parse: function(value) {
 				return new Date(value);
 			}
@@ -38,7 +38,7 @@ export const SunSystem: AFrame.SystemDefinition<Sun> = {
 		longitude: { default: 0 },
 		latitude: { default: 78 },
 		// Multiplier to increase simulation speed.
-		speed: { default: 1000 },
+		speed: { default: 100 },
 		// Update frequency, in (actual time) seconds.
 		accuracy: { default: 1 }
 	},
